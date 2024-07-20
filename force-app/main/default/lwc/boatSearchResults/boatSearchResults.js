@@ -1,24 +1,67 @@
-// ...
+import getBoats from '@salesforce/apex/BoatDataService.getBoats';
+import boatMessageChannel from '@salesforce/messageChannel/boatMessageChannel__c';
+import { subscribe, unsubscribe, APPLICATION_SCOPE, MessageContext,} from 'lightning/messageService';
+import { LightningElement, wire, track } from 'lwc';
+
 const SUCCESS_TITLE = 'Success';
 const MESSAGE_SHIP_IT     = 'Ship it!';
 const SUCCESS_VARIANT     = 'success';
 const ERROR_TITLE   = 'Error';
 const ERROR_VARIANT = 'error';
 export default class BoatSearchResults extends LightningElement {
-  selectedBoatId;
+  
   columns = [];
-  boatTypeId = '';
+  boatTypeId ;
   boats;
   isLoading = false;
+
+  subscription = null;
+  boatTypeId;
+
+  @wire(MessageContext)
+  messageContext; // wired message context
   
-  // wired message context
-  messageContext;
+  // Subscription reference for boat message channel
+  connectedCallback (){
+    this.subscription = subscribe(
+      this.messageContext,
+      boatMessageChannel,
+      (message) => this.handleMessage(message),
+      { scope: APPLICATION_SCOPE }
+      
+  );
+  console.log('SUSCRITO AL CANAL DE MENSAJES');
+  };
+handleMessage(message) {
+  this.boatTypeId = message.boatTypeId;
+  console.log ('LLEGO EL MENSAJE', message.boatTypeId);
+};
+disconnectedCallback() {
+  if (this.subscription) {
+    unsubscribe(this.subscription);
+    this.subscription = null;
+}
+};
+
+@wire(getBoats, { boatTypeId: '$boatTypeId' })
+  wiredBoats({ error, data }) {
+    if (data) {
+      this.boats = data;
+      console.log('DATA', data);
+    } else if (error) {
+      console.log('NO LLEGA NADA');
+    }
+  }
+  
+// public function that updates the existing boatTypeId property
+// uses notifyLoading
+searchBoats(boatTypeId) {
+ 
+ }
+
   // wired getBoats method 
   wiredBoats(result) { }
   
-  // public function that updates the existing boatTypeId property
-  // uses notifyLoading
-  searchBoats(boatTypeId) { }
   
   // this public function must refresh the boats asynchronously
   // uses notifyLoading

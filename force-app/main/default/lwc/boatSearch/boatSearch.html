@@ -1,8 +1,8 @@
 <template>
-    <lightning-layout multiple-rows>
+    <lightning-layout multiple-rows >
       <!-- Top -->
       <lightning-layout-item size="12">
-        <lightning-card title="Find a Boat" style="position: relative;">
+        <lightning-card title="Find a Boat" style="position: relative;"  >
           <slot name="actions">
             <button 
             class="slds-button slds-button_outline-brand" 
@@ -11,9 +11,10 @@
             >New Boat</button>
             </slot>
             
-          <p class="slds-var-p-horizontal_small">
+          <p class="slds-var-p-horizontal_small" >
             <c-boat-search-form
             class="slds-align_absolute-center"
+            onsearch = {searchBoats}
             ></c-boat-search-form>
           </p>
         </lightning-card>
