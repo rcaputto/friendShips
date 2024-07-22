@@ -33,8 +33,9 @@ export default class BoatSearchResults extends LightningElement {
   console.log('SUSCRITO AL CANAL DE MENSAJES');
   };
 handleMessage(message) {
-  this.boatTypeId = message.boatTypeId;
   console.log ('LLEGO EL MENSAJE', message.boatTypeId);
+  this.boatTypeId = message.boatTypeId;
+  this.searchBoats(this.boatTypeId);
 };
 disconnectedCallback() {
   if (this.subscription) {
@@ -43,20 +44,21 @@ disconnectedCallback() {
 }
 };
 
-@wire(getBoats, { boatTypeId: '$boatTypeId' })
-  wiredBoats({ error, data }) {
-    if (data) {
-      this.boats = data;
-      console.log('DATA', data);
-    } else if (error) {
-      console.log('NO LLEGA NADA');
-    }
-  }
-  
 // public function that updates the existing boatTypeId property
 // uses notifyLoading
 searchBoats(boatTypeId) {
- 
+  this.isLoading = true;
+  getBoats({boatTypeId})
+  .then ((result) => {
+    this.boats = result;
+    this.isLoading = false;
+    console.log('BOATS', result);
+  })
+  .catch((error) =>{
+    this.error = error;
+    this.isLoading = false;
+    console.log('ERROR' , error);
+  })
  }
 
   // wired getBoats method 
